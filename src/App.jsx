@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Github, Linkedin, Mail, ChevronDown, ExternalLink, Moon, Sun, Menu, X } from 'lucide-react';
+import Lenis from 'lenis';
 import grwmImage from './assets/images/grwm.png';
 import login from './assets/images/login.png';
 import game from './assets/images/game.png';
@@ -12,7 +13,6 @@ import pizza from './assets/images/pizza.png';
 import { InteractiveHoverButton } from "./component/button.jsx";
 import Contact from './component/contact';
 import Skills from './component/Skills';
-import YouTube from './component/YouTube';
 import Resume from './component/Resume';
 
 function App() {
@@ -20,10 +20,34 @@ function App() {
   const [isVisible, setIsVisible] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [hoveredProject, setHoveredProject] = useState(null);
+  const lenisRef = useRef(null);
 
   useEffect(() => {
     setIsVisible(true);
+
+    // Initialize Lenis for smooth scrolling
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      direction: 'vertical',
+      gestureDirection: 'vertical',
+      smooth: true,
+      smoothTouch: false,
+      touchMultiplier: 2,
+    });
+
+    lenisRef.current = lenis;
+
+    function raf(time) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+
+    requestAnimationFrame(raf);
+
+    return () => {
+      lenis.destroy();
+    };
   }, []);
 
   const handleImageError = (e) => {
@@ -37,23 +61,14 @@ function App() {
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
-    setMobileMenuOpen(false);
   };
 
-  const handleProjectHover = (project) => {
-    setHoveredProject(project);
-  };
-
-  const handleProjectLeave = () => {
-    setHoveredProject(null);
-  };
 
   const navigationItems = [
     { name: 'Home', id: 'home' },
     { name: 'Featured Projects', id: 'featured-projects' },
     { name: 'Other Projects', id: 'other-projects' },
     { name: 'Skills', id: 'skills' },
-    { name: 'YouTube', id: 'youtube' },
     { name: 'Resume', id: 'resume' },
     { name: 'Contact', id: 'contact' }
   ];
@@ -61,33 +76,54 @@ function App() {
   // Featured Projects
   const featuredProjects = [
     {
-      title: "Rishabh Electronics",
-      description: "A modern, responsive website for RISHABH ELECTRONICS, a trusted electronics and furniture store located in Baloda Bazar, Raipur, Chhattisgarh. Built with Next.js 14 and featuring beautiful 3D animations, modern UI design, and comprehensive business showcase.",
-      image: RE,
-      tags: ["React", "javascript", "next", "typescript"],
-      link: "https://rishabhelectronics.curiouscoder.live/",
+      title: "Cosmos Signal Nexus",
+      description: "An advanced signal processing and data analysis platform for space and astronomical data. Includes visualization tools, real-time data processing, and machine learning capabilities.",
+      image: "https://i.imgur.com/cosmos-signal.jpg",
+      tags: ["Python", "Data Science", "Signal Processing"],
+      link: "https://github.com/curiouscoder-cmd/cosmos-signal-nexus",
       featured: true
     },
     {
-      title: "Pizza Dashboard",
-      description: "The Pizza Dashboard is a full-featured management system designed specifically for pizza restaurants and delivery services. This application streamlines operations by providing an intuitive interface for managing customers, tracking orders, and scheduling deliveries.",
-      image: pizza,
-      tags: ["React", "javascript", "next"],
-      link: "https://pizza.curiouscoder.live/dashboard/activity",
+      title: "HackMate",
+      description: "A collaborative platform for hackathons that connects developers, designers, and innovators. Features team formation, project management, and real-time collaboration tools.",
+      image: "https://i.imgur.com/hackmate.jpg",
+      tags: ["React", "Collaboration", "Hackathon"],
+      link: "https://github.com/curiouscoder-cmd/HackMate_final",
       featured: true
     },
     {
-      title: "DRIFT RUN",
-      description: "Adventerous car rougelike  game made using unity and C# ",
-      image: game,
-      tags: ["unity", "C#"],
-      link: "https://curiouscoder.itch.io/driftrun-rougelike",
+      title: "MindMend",
+      description: "A mental health and wellness application designed to support users in their journey towards better mental health. Features include mood tracking, meditation guides, and personalized wellness recommendations.",
+      image: "https://i.imgur.com/mindmend.jpg",
+      tags: ["React", "Mental Health", "Wellness"],
+      link: "https://github.com/curiouscoder-cmd/MindMend",
       featured: true
     }
   ];
 
   // Other Projects
   const otherProjects = [
+    {
+      title: "Rishabh Electronics",
+      description: "A modern, responsive website for RISHABH ELECTRONICS, a trusted electronics and furniture store located in Baloda Bazar, Raipur, Chhattisgarh. Built with Next.js 14 and featuring beautiful 3D animations, modern UI design, and comprehensive business showcase.",
+      image: RE,
+      tags: ["React", "javascript", "next", "typescript"],
+      link: "https://rishabhelectronics.curiouscoder.live/"
+    },
+    {
+      title: "Pizza Dashboard",
+      description: "The Pizza Dashboard is a full-featured management system designed specifically for pizza restaurants and delivery services. This application streamlines operations by providing an intuitive interface for managing customers, tracking orders, and scheduling deliveries.",
+      image: pizza,
+      tags: ["React", "javascript", "next"],
+      link: "https://pizza.curiouscoder.live/dashboard/activity"
+    },
+    {
+      title: "DRIFT RUN",
+      description: "Adventerous car rougelike  game made using unity and C# ",
+      image: game,
+      tags: ["unity", "C#"],
+      link: "https://curiouscoder.itch.io/driftrun-rougelike"
+    },
     {
       title: "Get Ready With Me",
       description: "The one stop place to get a customised Drip - A fashion design platform",
@@ -122,13 +158,24 @@ function App() {
       image: Text,
       tags: ["React", "javascript", "BootStrap"],
       link: "https://nityavitereactpractice.netlify.app/"
+    },
+    {
+      title: "VoxAssist",
+      description: "An intelligent voice assistant application that leverages natural language processing and AI to provide smart voice-based interactions and assistance.",
+      image: "https://placehold.co/400x300/ec4899/ffffff?text=VoxAssist",
+      tags: ["AI", "Voice", "NLP"],
+      link: "https://github.com/GreenHacker420/VoxAssist"
     }
   ];
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
       {/* Navigation */}
-      <nav className={`fixed w-full z-50 ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg`}>
+      <nav className={`fixed w-full z-50 backdrop-blur-md transition-all duration-300 ${
+        darkMode 
+          ? 'bg-gray-900/80 border-b border-gray-700/50' 
+          : 'bg-white/80 border-b border-gray-200/50'
+      }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <span className="text-2xl font-bold">Nitya's Portfolio</span>
@@ -322,25 +369,29 @@ function App() {
             {featuredProjects.map((project, index) => (
               <div
                 key={index}
-                className={`rounded-3xl overflow-hidden shadow-2xl transform hover:-translate-y-6 hover:scale-105 transition-all duration-500 relative backdrop-blur-sm border cursor-pointer ${
+                className={`premium-card rounded-3xl overflow-hidden transform transition-all duration-500 relative backdrop-blur-md border cursor-pointer group ${
                   darkMode
-                    ? 'bg-gray-800/80 border-gray-700/50 hover:bg-gray-700/90'
-                    : 'bg-white/90 border-white/50 hover:bg-white/95'
+                    ? 'bg-gray-800/60 border-gray-700/50 hover:bg-gray-700/80'
+                    : 'bg-white/70 border-white/60 hover:bg-white/90'
                 }`}
                 style={{
                   background: darkMode
-                    ? 'linear-gradient(135deg, rgba(31, 41, 55, 0.8) 0%, rgba(17, 24, 39, 0.9) 100%)'
-                    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.95) 100%)'
+                    ? 'linear-gradient(135deg, rgba(31, 41, 55, 0.6) 0%, rgba(17, 24, 39, 0.8) 100%)'
+                    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(248, 250, 252, 0.9) 100%)',
+                  boxShadow: darkMode
+                    ? '0 8px 32px rgba(0, 0, 0, 0.3)'
+                    : '0 8px 32px rgba(0, 0, 0, 0.1)'
                 }}
-                onMouseEnter={() => handleProjectHover(project)}
-                onMouseLeave={handleProjectLeave}
               >
                 <div className="absolute top-6 right-6 z-10">
                   <span className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-bold px-4 py-2 rounded-full shadow-lg">
                     ⭐ FEATURED
                   </span>
                 </div>
-                <img src={project.image} alt={project.title} className="w-full h-56 object-cover" />
+                <div className="relative overflow-hidden h-56">
+                  <img src={project.image} alt={project.title} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </div>
                 <div className="p-8">
                   <h3 className={`text-2xl font-bold mb-3 ${darkMode ? 'text-white' : 'text-gray-900'} font-playfair`}>{project.title}</h3>
                   <p className={`mb-6 text-base leading-relaxed ${darkMode ? 'text-gray-300' : 'text-gray-600'} font-poppins`}>{project.description}</p>
@@ -360,7 +411,7 @@ function App() {
                     href={project.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white px-6 py-3 rounded-2xl font-bold transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
+                    className="premium-btn inline-flex items-center bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white px-6 py-3 rounded-2xl font-bold transition-all duration-300 transform hover:scale-105 hover:shadow-2xl"
                   >
                     View Project <ExternalLink className="ml-2 w-5 h-5" />
                   </a>
@@ -410,29 +461,31 @@ function App() {
               <div
                 key={index}
                 className="flip-card-container h-80"
-                style={{
-                  animationDelay: `${index * 0.2}s`
-                }}
               >
-                {/* Flip Card Container */}
+                {/* Flip Card Inner */}
                 <div className="flip-card-inner">
-
+                  
                   {/* Front Side */}
-                  <div className={`flip-card-front overflow-hidden shadow-xl backdrop-blur-sm border ${
-                    darkMode
-                      ? 'bg-gray-700/80 border-gray-600/50'
-                      : 'bg-white/90 border-white/50'
-                  }`}
-                  style={{
-                    background: darkMode
-                      ? 'linear-gradient(135deg, rgba(55, 65, 81, 0.8) 0%, rgba(31, 41, 55, 0.9) 100%)'
-                      : 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.95) 100%)'
-                  }}>
-                    <div className="relative overflow-hidden h-48">
-                      <img
-                        src={project.image}
-                        alt={project.title}
-                        className="w-full h-full object-cover"
+                  <div 
+                    className={`flip-card-front rounded-2xl overflow-hidden backdrop-blur-md border ${
+                      darkMode
+                        ? 'bg-gray-800/60 border-gray-700/50'
+                        : 'bg-white/70 border-white/60'
+                    }`}
+                    style={{
+                      background: darkMode
+                        ? 'linear-gradient(135deg, rgba(31, 41, 55, 0.6) 0%, rgba(17, 24, 39, 0.8) 100%)'
+                        : 'linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(248, 250, 252, 0.9) 100%)',
+                      boxShadow: darkMode
+                        ? '0 8px 32px rgba(0, 0, 0, 0.3)'
+                        : '0 8px 32px rgba(0, 0, 0, 0.1)'
+                    }}
+                  >
+                    <div className="relative overflow-hidden h-40">
+                      <img 
+                        src={project.image} 
+                        alt={project.title} 
+                        className="w-full h-full object-cover" 
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
                       <div className="absolute bottom-4 left-4 right-4">
@@ -441,25 +494,24 @@ function App() {
                         </h3>
                       </div>
                     </div>
-
-                    <div className="p-4">
-                      <p className={`text-sm mb-4 line-clamp-3 ${darkMode ? 'text-gray-300' : 'text-gray-600'} font-poppins`}>
+                    <div className="p-6">
+                      <p className={`mb-4 text-sm leading-relaxed line-clamp-3 ${darkMode ? 'text-gray-300' : 'text-gray-600'} font-poppins`}>
                         {project.description}
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {project.tags.slice(0, 3).map((tag, tagIndex) => (
                           <span
                             key={tagIndex}
-                            className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              darkMode ? 'bg-gray-600/80 text-gray-300' : 'bg-gray-100 text-gray-700'
+                            className={`px-3 py-1 rounded-full text-xs font-medium ${
+                              darkMode ? 'bg-gray-700/80 text-gray-300' : 'bg-gray-100 text-gray-700'
                             }`}
                           >
                             {tag}
                           </span>
                         ))}
                         {project.tags.length > 3 && (
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            darkMode ? 'bg-gray-600/80 text-gray-400' : 'bg-gray-100 text-gray-500'
+                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                            darkMode ? 'bg-gray-700/80 text-gray-400' : 'bg-gray-100 text-gray-500'
                           }`}>
                             +{project.tags.length - 3}
                           </span>
@@ -469,13 +521,20 @@ function App() {
                   </div>
 
                   {/* Back Side */}
-                  <div className={`flip-card-back overflow-hidden shadow-xl backdrop-blur-sm border ${
-                    darkMode
-                      ? 'bg-gradient-to-br from-cyan-900/90 to-blue-900/90 border-cyan-400/50'
-                      : 'bg-gradient-to-br from-cyan-50/95 to-blue-50/95 border-cyan-400/50'
-                  }`}>
+                  <div 
+                    className={`flip-card-back rounded-2xl overflow-hidden backdrop-blur-md border ${
+                      darkMode
+                        ? 'bg-gradient-to-br from-cyan-900/90 to-blue-900/90 border-cyan-400/50'
+                        : 'bg-gradient-to-br from-cyan-50/95 to-blue-50/95 border-cyan-400/50'
+                    }`}
+                    style={{
+                      boxShadow: darkMode
+                        ? '0 8px 32px rgba(0, 0, 0, 0.3)'
+                        : '0 8px 32px rgba(0, 0, 0, 0.1)'
+                    }}
+                  >
                     <div className="p-6 h-full flex flex-col justify-center items-center text-center">
-                      {/* Project Icon/Symbol */}
+                      {/* Project Icon */}
                       <div className={`w-16 h-16 rounded-full mb-4 flex items-center justify-center ${
                         darkMode ? 'bg-cyan-400/20' : 'bg-cyan-400/30'
                       }`}>
@@ -492,7 +551,7 @@ function App() {
                         {project.tags.map((tag, tagIndex) => (
                           <span
                             key={tagIndex}
-                            className={`px-3 py-1 rounded-full text-sm font-medium ${
+                            className={`px-3 py-1 rounded-full text-xs font-medium ${
                               darkMode
                                 ? 'bg-cyan-400/20 text-cyan-300 border border-cyan-400/30'
                                 : 'bg-cyan-100 text-cyan-700 border border-cyan-300/50'
@@ -503,26 +562,20 @@ function App() {
                         ))}
                       </div>
 
-                      {/* Action Buttons */}
-                      <div className="space-y-3 w-full">
-                        <a
-                          href={project.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={`w-full inline-flex items-center justify-center px-6 py-3 rounded-xl font-bold transition-all duration-300 transform hover:scale-105 ${
-                            darkMode
-                              ? 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white'
-                              : 'bg-gradient-to-r from-cyan-600 to-blue-700 hover:from-cyan-500 hover:to-blue-600 text-white'
-                          } shadow-lg hover:shadow-xl`}
-                        >
-                          <ExternalLink className="mr-2 w-5 h-5" />
-                          View Live Project
-                        </a>
-
-                        <div className={`text-sm ${darkMode ? 'text-cyan-300' : 'text-cyan-600'} font-medium`}>
-                          Click to explore this project
-                        </div>
-                      </div>
+                      {/* Action Button */}
+                      <a
+                        href={project.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`premium-btn w-full inline-flex items-center justify-center px-6 py-3 rounded-xl font-bold transition-all duration-300 transform hover:scale-105 ${
+                          darkMode
+                            ? 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white'
+                            : 'bg-gradient-to-r from-cyan-600 to-blue-700 hover:from-cyan-500 hover:to-blue-600 text-white'
+                        } shadow-lg hover:shadow-xl`}
+                      >
+                        <ExternalLink className="mr-2 w-5 h-5" />
+                        View Project
+                      </a>
                     </div>
                   </div>
                 </div>
@@ -534,9 +587,6 @@ function App() {
 
       {/* Skills Section */}
       <Skills darkMode={darkMode} />
-
-      {/* YouTube Section */}
-      <YouTube darkMode={darkMode} />
 
       {/* Resume Section */}
       <Resume darkMode={darkMode} />
@@ -555,53 +605,6 @@ function App() {
         </div>
       </footer>
 
-      {/* Project Preview Overlay */}
-      {hoveredProject && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-none">
-          {/* Background Overlay */}
-          <div className="absolute inset-0 bg-black/20 backdrop-blur-sm"></div>
-
-          {/* Preview Tile */}
-          <div className="relative preview-tile">
-            <div className={`w-[600px] h-[400px] rounded-3xl shadow-2xl backdrop-blur-md border overflow-hidden ${
-              darkMode
-                ? 'bg-gray-800/10 border-gray-600/30'
-                : 'bg-white/10 border-white/30'
-            }`}
-            style={{
-              boxShadow: darkMode
-                ? '0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(99, 102, 241, 0.3), 0 0 30px rgba(99, 102, 241, 0.2)'
-                : '0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(99, 102, 241, 0.3), 0 0 30px rgba(99, 102, 241, 0.2)'
-            }}>
-              {/* Project Image Preview */}
-              <div className="relative w-full h-full overflow-hidden rounded-3xl">
-                <img
-                  src={hoveredProject.image}
-                  alt={hoveredProject.title}
-                  className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-500"
-                />
-
-                {/* Subtle overlay for better visibility */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/10"></div>
-
-                {/* Featured badge */}
-                <div className="absolute top-6 right-6">
-                  <span className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-bold px-4 py-2 rounded-full shadow-lg">
-                    ⭐ FEATURED PROJECT
-                  </span>
-                </div>
-
-                {/* Project title overlay */}
-                <div className="absolute bottom-6 left-6 right-6">
-                  <h3 className="text-white text-2xl font-bold font-playfair drop-shadow-lg">
-                    {hoveredProject.title}
-                  </h3>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

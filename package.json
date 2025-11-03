@@ -17,6 +17,7 @@
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.18",
     "framer-motion": "^11.0.14",
+    "lenis": "^1.1.13",
     "lucide-react": "^0.487.0",
     "nodemailer": "^6.9.12",
     "postcss": "^8.4.35",
